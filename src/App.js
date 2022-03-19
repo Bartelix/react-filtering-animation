@@ -1,25 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { useEffect, useState } from "react";
+import Character from "./Character";
+import Filter from "./Filter";
+import { motion, AnimatePresence } from "framer-motion";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const [characters, setCharacters] = useState([]);
+	const [species, setSpecies] = useState("All");
+
+	let api = `https://rickandmortyapi.com/api/character/?page=1${species !== "All" ? "&species=" + species : ""}`;
+
+	useEffect(() => {
+		(async () => {
+			const data = await fetch(api);
+			const { results } = await data.json();
+			setCharacters(results);
+		})();
+	}, [api]);
+
+	return (
+		<div className="App">
+			<Filter species={species} setSpecies={setSpecies} />
+			<motion.div animate={{ opacity: 1 }} initial={{ opacity: 0 }} exit={{ oapcity: 0 }} layout className="characters">
+				<AnimatePresence>
+					{characters.map((character) => (
+						<Character key={character.id} character={character} />
+					))}
+				</AnimatePresence>
+			</motion.div>
+		</div>
+	);
 }
 
 export default App;
